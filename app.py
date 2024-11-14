@@ -11,7 +11,7 @@ from typing import List, Dict, Optional
 from datetime import datetime
 import math
 import os
-import shutil  # Add this import
+import shutil
 import gc
 import time
 from contextlib import contextmanager
@@ -33,7 +33,6 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-
 
 # Set page config at the very top
 st.set_page_config(
@@ -132,6 +131,7 @@ class ArabicTokenizer:
     def __init__(self, vocab_size: int = 10000):
         self.vocab_size = vocab_size
         self.processor = ArabicTextProcessor()
+        self.word_freq = Counter()
         
         # Special tokens
         self.PAD_token = '[PAD]'
@@ -227,6 +227,9 @@ class ArabicTokenizer:
     def build_vocabulary(self, texts: List[str]):
         """Build vocabulary from texts"""
         try:
+            # Reset word frequency counter
+            self.word_freq = Counter()
+            
             for text in texts:
                 cleaned_text = self.processor.clean_text(
                     self.processor.normalize_arabic(text)
@@ -237,11 +240,22 @@ class ArabicTokenizer:
             top_words = [word for word, _ in 
                         self.word_freq.most_common(self.vocab_size - 4)]
             
+            # Reset vocabulary
+            self.word2idx = {
+                self.PAD_token: 0,
+                self.UNK_token: 1,
+                self.SOS_token: 2,
+                self.EOS_token: 3,
+            }
+            
             # Add words to vocabulary
             for word in top_words:
-                idx = len(self.word2idx)
-                self.word2idx[word] = idx
-                self.idx2word[idx] = word
+                if word not in self.word2idx:
+                    idx = len(self.word2idx)
+                    self.word2idx[word] = idx
+                    
+            # Update reverse mapping
+            self.idx2word = {v: k for k, v in self.word2idx.items()}
                 
         except Exception as e:
             logger.error(f"Error in build_vocabulary: {str(e)}")
