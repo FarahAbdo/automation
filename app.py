@@ -1,3 +1,6 @@
+import logging
+import warnings
+from pathlib import Path
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -14,12 +17,17 @@ import os
 import gc
 import time
 from contextlib import contextmanager
-import logging
-import warnings
-from pathlib import Path
+from dotenv import load_dotenv
 
-import os
-import shutil
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Suppress warnings
+warnings.filterwarnings('ignore')
 
 if os.path.exists('models'):
     shutil.rmtree('models')
