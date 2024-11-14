@@ -1,6 +1,3 @@
-import logging
-import warnings
-from pathlib import Path
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -14,21 +11,19 @@ from typing import List, Dict, Optional
 from datetime import datetime
 import math
 import os
+import shutil  # Add this import
 import gc
 import time
 from contextlib import contextmanager
+import logging
+import warnings
+from pathlib import Path
 from dotenv import load_dotenv
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 # Suppress warnings
 warnings.filterwarnings('ignore')
 
+# Check and remove models directory
 if os.path.exists('models'):
     shutil.rmtree('models')
 
@@ -39,8 +34,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Suppress warnings
-warnings.filterwarnings('ignore')
 
 # Set page config at the very top
 st.set_page_config(
